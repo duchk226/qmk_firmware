@@ -63,6 +63,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #   define OLED_TIMEOUT 30000
 #endif
 
+# define SPLIT_TRANSPORT_MIRROR
+# define SPLIT_TRANSPORT_MIRROR
+
 #ifdef RGB_MATRIX_ENABLE
 #   define RGB_MATRIX_KEYPRESSES // reacts to keypresses
 // #   define RGB_MATRIX_KEYRELEASES // reacts to keyreleases (instead of keypresses)
