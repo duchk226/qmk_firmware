@@ -27,7 +27,11 @@ enum custom_keycodes {
   RAISE,
   ADJUST,
   RGBRST,
-  KC_RACL // right alt / colon
+  KC_RACL, // right alt / colon
+  GH_PR_C,
+  GH_PR_V,
+  FETCH_ORIGIN,
+  RB_ORIGIN_MASTER,
 };
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
@@ -49,7 +53,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //|------+------+-------+-------+-------+-------|                |------+------+------+------+------+------|
     KC_LCTL, KC_P1, KC_P2, KC_P3, KC_P4, KC_P5,                     KC_LEFT, KC_DOWN, KC_UP, KC_RGHT, KC_NO, KC_NO,
   //|------+------+-------+-------+-------+-------|                |------+------+------+------+------+------|
-    KC_LSFT, KC_P6, KC_P7, KC_P8, KC_P9, KC_P0,                     KC_HOME, KC_END, KC_NO, KC_NO, KC_NO, KC_F12,
+    KC_LSFT, KC_P6, KC_P7, KC_P8, KC_P9, KC_P0,                     KC_BTN1, KC_BTN2, KC_NO, KC_NO, KC_NO, KC_F12,
   //|------+------+-------+-------+-------+-------+------|  |------+------+------+------+------+------+------|
                                     KC_LGUI, LOWER,KC_SPC,   KC_ENT, RAISE,KC_RALT
                                   //`--------------------'  `--------------------'
@@ -57,7 +61,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
   [_LOWER] = LAYOUT_split_3x6_3(
   //,-----------------------------------------.                ,-----------------------------------------.
-  KC_TAB, KC_EXLM, KC_AT, KC_HASH, KC_DLR, KC_PERC, KC_CIRC, KC_AMPR, KC_ASTR, KC_LPRN, KC_RPRN, KC_BSPC,
+  KC_ESC, KC_EXLM, KC_AT, KC_HASH, KC_DLR, KC_PERC, KC_CIRC, KC_AMPR, KC_ASTR, KC_LPRN, KC_RPRN, KC_BSPC,
   //|------+------+------+------+------+------|                |------+------+------+------+------+------|
   KC_LCTL, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_MINS, KC_EQL, KC_LBRC, KC_RBRC, KC_BSLS, KC_GRV,
   //|------+------+------+------+------+------|                |------+------+------+------+------+------|
@@ -69,11 +73,11 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
   [_ADJUST] = LAYOUT_split_3x6_3(
   //,-----------------------------------------.                ,-----------------------------------------.
-  QK_BOOT, KC_MPRV, KC_MPLY, KC_MNXT, KC_VOLD, KC_VOLU, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,
+  QK_BOOT, KC_MPRV, KC_MPLY, KC_MNXT, KC_VOLD, KC_VOLU,         GH_PR_V, GH_PR_C, KC_NO, KC_NO, KC_NO, KC_NO,
   //|------+------+------+------+------+------|                |------+------+------+------+------+------|
-    RGB_TOG,RGB_HUI,RGB_SAI,RGB_VAI,RGB_SPI,KC_BRIU,               KC_PAUSE,KC_VOLU, KC_NO, KC_NO, KC_NO, KC_NO,
+    RGB_TOG,RGB_HUI,RGB_SAI,RGB_VAI,RGB_SPI,KC_BRIU,            FETCH_ORIGIN,RB_ORIGIN_MASTER, KC_NO, KC_NO, KC_NO, KC_NO,
   //|------+------+------+------+------+------|                |------+------+------+------+------+------|
-    RGB_MOD,RGB_HUD,RGB_SAD,RGB_VAD,RGB_SPD,KC_BRID,               KC_SCRL,KC_VOLD, KC_NO, KC_NO, KC_NO, RGB_RMOD,
+    RGB_MOD,RGB_HUD,RGB_SAD,RGB_VAD,RGB_SPD,KC_BRID,           KC_SCRL,KC_VOLD, KC_NO, KC_NO, KC_NO, RGB_RMOD,
   //|------+------+------+------+------+------+------|  |------+------+------+------+------+------+------|
                                 KC_LGUI, LOWER,KC_SPC,   KC_ENT, RAISE,KC_RALT
                               //`--------------------'  `--------------------'
@@ -340,6 +344,27 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         }
       #endif
       break;
+    case GH_PR_C:
+      if (record->event.pressed) {
+        SEND_STRING("gh pr create -w\n");
+      }
+      break;
+    case GH_PR_V:
+      if (record->event.pressed) {
+        SEND_STRING("gh pr view -w\n");
+      }
+      break;
+    case FETCH_ORIGIN:
+      if (record->event.pressed) {
+        SEND_STRING("git fetch origin\n");
+      }
+      break;
+    case RB_ORIGIN_MASTER:
+      if (record->event.pressed) {
+        SEND_STRING("git rebase origin/master\n");
+      }
+      break;
+
   }
   return true;
 }
@@ -355,3 +380,4 @@ void suspend_wakeup_init_keymap(void) {
 }
 
 #endif
+
