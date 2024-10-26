@@ -11,6 +11,15 @@ extern keymap_config_t keymap_config;
 extern rgblight_config_t rgblight_config;
 #endif
 
+// Tap Dance declarations
+enum {
+  ENT_CLN,
+};
+
+tap_dance_action_t tap_dance_actions[] = {
+  [ENT_CLN] = ACTION_TAP_DANCE_DOUBLE(KC_ENT, KC_COLN)
+};
+
 // Each layer gets a name for readability, which is then used in the keymap matrix below.
 // The underscores don't mean anything - you can have a layer called STUFF or any other name.
 // Layer names don't all need to be of the same length, obviously, and you can also skip them
@@ -28,11 +37,6 @@ enum custom_keycodes {
   RAISE,
   ADJUST,
   RGBRST,
-  KC_RACL, // right alt / colon
-  GH_PR_C,
-  GH_PR_V,
-  FETCH_ORIGIN,
-  RB_ORIGIN_MASTER,
 };
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
@@ -44,7 +48,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //|------+------+------+------+------+------|                |------+------+-------+------+-------+--------|
     KC_NO,  KC_Z,  KC_X,  KC_C,  KC_V,  KC_B,                   KC_N,  KC_M,KC_COMM,KC_DOT,KC_SLSH,KC_DEL,
   //|------+------+------+------+------+------+------|  |------+------+------+-------+------+-------+--------|
-                               KC_LGUI,LOWER, KC_SPC,   KC_ENT, RAISE, KC_NO
+                               KC_NO,LOWER, KC_SPC,   TD(ENT_CLN), RAISE, KC_NO
                               //`--------------------'  `--------------------'
   ),
 
@@ -56,7 +60,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //|------+------+-------+-------+-------+-------|                |------+------+------+------+------+------|
     KC_NO, KC_6, KC_7, KC_8, KC_9, KC_0,                     KC_BTN1, KC_BTN2, KC_NO, KC_NO, KC_NO, KC_F12,
   //|------+------+-------+-------+-------+-------+------|  |------+------+------+------+------+------+------|
-                                    KC_LGUI, LOWER,KC_SPC,   KC_ENT, RAISE,KC_NO
+                                    KC_NO, LOWER,KC_SPC,   KC_ENT, RAISE,KC_NO
                                   //`--------------------'  `--------------------'
   ),
 
@@ -68,13 +72,13 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //|------+------+------+------+------+------|                |------+------+------+------+------+------|
   KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_UNDS, KC_PLUS, KC_LCBR, KC_RCBR, KC_PIPE, KC_TILD,
   //|------+------+------+------+------+------+------|  |------+------+------+------+------+------+------|
-                                KC_LGUI, LOWER,KC_SPC,   KC_ENT, RAISE,KC_NO
+                                KC_NO, LOWER,KC_SPC,   KC_ENT, RAISE,KC_NO
                               //`--------------------'  `--------------------'
   ),
 
   [_ADJUST] = LAYOUT_split_3x6_3(
   //,-----------------------------------------.                ,-----------------------------------------.
-  QK_BOOT, KC_MPRV, KC_MPLY, KC_MNXT, KC_VOLD, KC_VOLU,         GH_PR_V, GH_PR_C, KC_NO, KC_NO, KC_NO, KC_NO,
+  QK_BOOT, KC_MPRV, KC_MPLY, KC_MNXT, KC_VOLD, KC_VOLU,         KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,
   //|------+------+------+------+------+------|                |------+------+------+------+------+------|
     RGB_TOG,RGB_HUI,RGB_SAI,RGB_VAI,RGB_SPI,KC_BRIU,            KC_NO,KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,
   //|------+------+------+------+------+------|                |------+------+------+------+------+------|
@@ -291,8 +295,6 @@ bool oled_task_user(void) {
 
 #endif
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
-  static uint16_t my_colon_timer;
-
   switch (keycode) {
     case LOWER:
       if (record->event.pressed) {
@@ -319,17 +321,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
           layer_off(_ADJUST);
         }
         return false;
-    case KC_RACL:
-        if (record->event.pressed) {
-          my_colon_timer = timer_read();
-          register_code(KC_RALT);
-        } else {
-          unregister_code(KC_RALT);
-          if (timer_elapsed(my_colon_timer) < TAPPING_TERM) {
-            SEND_STRING(":"); // Change the character(s) to be sent on tap here
-          }
-        }
-        return false;
     case RGBRST:
       #ifdef RGBLIGHT_ENABLE
         if (record->event.pressed) {
@@ -345,27 +336,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         }
       #endif
       break;
-    case GH_PR_C:
-      if (record->event.pressed) {
-        SEND_STRING("gh pr create -w\n");
-      }
-      break;
-    case GH_PR_V:
-      if (record->event.pressed) {
-        SEND_STRING("gh pr view -w\n");
-      }
-      break;
-    case FETCH_ORIGIN:
-      if (record->event.pressed) {
-        SEND_STRING("git fetch origin\n");
-      }
-      break;
-    case RB_ORIGIN_MASTER:
-      if (record->event.pressed) {
-        SEND_STRING("git rebase origin/master\n");
-      }
-      break;
-
   }
   return true;
 }
@@ -381,4 +351,5 @@ void suspend_wakeup_init_keymap(void) {
 }
 
 #endif
+
 
